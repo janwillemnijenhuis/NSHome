@@ -18,6 +18,9 @@ import java.util.HashSet;
  * In particular, a correct solution to the challenge must NOT be posted  *
  * in public places, to preserve the learning effect for future students. *
  **************************************************************************
+ *
+ * @author bart.fischer s0016667
+ * @author janwillem.nijenhuis s2935511
  */
 public class MyAlternatingProtocol extends IRDTProtocol {
 
