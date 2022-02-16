@@ -30,24 +30,38 @@ public class MyProtocol extends IRDTProtocol {
 
         // read from the input file
         Integer[] fileContents = Utils.getFileContents(getFileID());
-
-        // keep track of where we are in the data
+        int remainingLen = fileContents.length;
+        boolean fileEnd = false;
         int filePointer = 0;
+        int index = 0;
+        int datalen = 0;
+        while (!fileEnd) {
+            // create a new packet of appropriate size
+            if ((remainingLen - filePointer) < DATASIZE) {
+                datalen = remainingLen;
+            } else {
+                datalen = DATASIZE;
+            }
+            System.out.println("Sending packet of length: " + datalen);
+            Integer[] pkt = new Integer[HEADERSIZE + datalen];
+            // write something random into the header byte
+            pkt[0] = index;
+            // copy databytes from the input file into data part of the packet, i.e., after the header
+            System.arraycopy(fileContents, filePointer, pkt, HEADERSIZE, datalen);
 
-        // create a new packet of appropriate size
-        int datalen = Math.min(DATASIZE, fileContents.length - filePointer);
-        Integer[] pkt = new Integer[HEADERSIZE + datalen];
-        // write something random into the header byte
-        pkt[0] = 123;    
-        // copy databytes from the input file into data part of the packet, i.e., after the header
-        System.arraycopy(fileContents, filePointer, pkt, HEADERSIZE, datalen);
+            // send the packet to the network layer
+            getNetworkLayer().sendPacket(pkt);
+            System.out.println("Sent one packet with header=" + pkt[0]);
 
-        // send the packet to the network layer
-        getNetworkLayer().sendPacket(pkt);
-        System.out.println("Sent one packet with header="+pkt[0]);
-
-        // schedule a timer for 1000 ms into the future, just to show how that works:
-        framework.Utils.Timeout.SetTimeout(1000, this, 28);
+            // schedule a timer for 1000 ms into the future, just to show how that works:
+            index++;
+            remainingLen -= datalen;
+            filePointer += datalen;
+            if (remainingLen == 0) {
+                fileEnd = true;
+            }
+            framework.Utils.Timeout.SetTimeout(1000, this, 28);
+        }
 
         // and loop and sleep; you may use this loop to check for incoming acks...
         boolean stop = false;
@@ -79,6 +93,7 @@ public class MyProtocol extends IRDTProtocol {
 
         // loop until we are done receiving the file
         boolean stop = false;
+        int index = 0;
         while (!stop) {
 
             // try to receive a packet from the network layer
@@ -95,9 +110,8 @@ public class MyProtocol extends IRDTProtocol {
                 int datalen= packet.length - HEADERSIZE;
                 fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                index++;
 
-                // and let's just hope the file is now complete
-                stop=true;
 
             }else{
                 // wait ~10ms (or however long the OS makes us wait) before trying again
@@ -106,6 +120,9 @@ public class MyProtocol extends IRDTProtocol {
                 } catch (InterruptedException e) {
                     stop = true;
                 }
+            }
+            if (index == 2) {
+                stop = true;
             }
         }
 
