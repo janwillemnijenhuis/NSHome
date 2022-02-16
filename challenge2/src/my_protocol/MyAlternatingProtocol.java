@@ -26,7 +26,7 @@ public class MyAlternatingProtocol extends IRDTProtocol {
 
     // change the following as you wish:
     static final int HEADERSIZE=1;   // number of header bytes in each packet
-    static final int DATASIZE=128;   // max. number of user data bytes in each packet
+    static final int DATASIZE=512;   // max. number of user data bytes in each packet
     private boolean stop = false;
 
     @Override
@@ -62,12 +62,12 @@ public class MyAlternatingProtocol extends IRDTProtocol {
             System.out.println("Sent one packet with round-packet=" + roundCount + "-" + pkt[0]);
 
             // schedule a timer for 1000 ms into the future, just to show how that works:
-            framework.Utils.Timeout.SetTimeout(10, this, 28);
+            framework.Utils.Timeout.SetTimeout(1000, this, 28);
 
             // and loop and sleep; you may use this loop to check for incoming acks...
             while (!stop) {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(100);
                     // check for incoming ack
                     Integer[] ack = getNetworkLayer().receivePacket();
                     if (ack != null && ack[0] == index) {

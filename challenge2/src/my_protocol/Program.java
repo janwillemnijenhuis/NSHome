@@ -23,10 +23,10 @@ public class Program {
 
     // Choose ID of test file to transmit: 1, 2, 3, 4, 5 or 6
     // Sizes in bytes are: 248, 2085, 6267, 21067, 53228, 141270
-    private static int file = 2;
+    private static int file = 6;
 
     // Change to your protocol implementation
-    private static IRDTProtocol protocolImpl = new MySlidingWindowProtocol();
+    private static IRDTProtocol protocolImpl = new MyAlternatingProtocol();
 
     // Challenge server address
     // See the website for the hostname of the server
