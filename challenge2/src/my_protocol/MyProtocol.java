@@ -34,7 +34,7 @@ public class MyProtocol extends IRDTProtocol {
         boolean fileEnd = false;
         int filePointer = 0;
         int index = 0;
-        int datalen = 0;
+        int datalen;
         while (!fileEnd) {
             // create a new packet of appropriate size
             if ((remainingLen - filePointer) < DATASIZE) {
@@ -54,25 +54,31 @@ public class MyProtocol extends IRDTProtocol {
             System.out.println("Sent one packet with header=" + pkt[0]);
 
             // schedule a timer for 1000 ms into the future, just to show how that works:
-            index++;
-            remainingLen -= datalen;
-            filePointer += datalen;
-            if (remainingLen == 0) {
-                fileEnd = true;
-            }
             framework.Utils.Timeout.SetTimeout(1000, this, 28);
-        }
 
-        // and loop and sleep; you may use this loop to check for incoming acks...
-        boolean stop = false;
-        while (!stop) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                stop = true;
+            // and loop and sleep; you may use this loop to check for incoming acks...
+            boolean stop = false;
+            while (!stop) {
+                try {
+                    Thread.sleep(10);
+                    Integer[] ack = getNetworkLayer().receivePacket();
+                    if (ack != null && ack[0] == index) {
+                        System.out.println("Acknowledgement " + ack[0] + " received");
+                        index++;
+                        remainingLen -= datalen;
+                        filePointer += datalen;
+                        if (remainingLen == 0) {
+                            System.out.println("Entire file sent");
+                            fileEnd = true;
+                        }
+                        stop = true;
+                    }
+                } catch (InterruptedException e) {
+                    System.out.println("Interruption");
+                    stop = true;
+                }
             }
         }
-
     }
 
     @Override
@@ -110,8 +116,11 @@ public class MyProtocol extends IRDTProtocol {
                 int datalen= packet.length - HEADERSIZE;
                 fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                Integer[] pkt = new Integer[1];
+                pkt[0] = packet[0];
+                System.out.println("Sending ACK " + pkt[0]);
+                getNetworkLayer().sendPacket(pkt);
                 index++;
-
 
             }else{
                 // wait ~10ms (or however long the OS makes us wait) before trying again
