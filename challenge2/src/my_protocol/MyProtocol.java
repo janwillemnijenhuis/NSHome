@@ -4,6 +4,7 @@ import framework.IRDTProtocol;
 import framework.Utils;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * @version 10-07-2019
@@ -23,6 +24,7 @@ public class MyProtocol extends IRDTProtocol {
     // change the following as you wish:
     static final int HEADERSIZE=1;   // number of header bytes in each packet
     static final int DATASIZE=128;   // max. number of user data bytes in each packet
+    private boolean stop = false;
 
     @Override
     public void sender() {
@@ -32,12 +34,14 @@ public class MyProtocol extends IRDTProtocol {
         Integer[] fileContents = Utils.getFileContents(getFileID());
         int remainingLen = fileContents.length;
         boolean fileEnd = false;
+        boolean fileSent = false;
         int filePointer = 0;
         int index = 0;
         int datalen;
         while (!fileEnd) {
+            stop = false;
             // create a new packet of appropriate size
-            if ((remainingLen - filePointer) < DATASIZE) {
+            if ((fileContents.length - filePointer) < DATASIZE) {
                 datalen = remainingLen;
             } else {
                 datalen = DATASIZE;
@@ -57,21 +61,34 @@ public class MyProtocol extends IRDTProtocol {
             framework.Utils.Timeout.SetTimeout(1000, this, 28);
 
             // and loop and sleep; you may use this loop to check for incoming acks...
-            boolean stop = false;
             while (!stop) {
                 try {
                     Thread.sleep(10);
                     Integer[] ack = getNetworkLayer().receivePacket();
                     if (ack != null && ack[0] == index) {
                         System.out.println("Acknowledgement " + ack[0] + " received");
-                        index++;
-                        remainingLen -= datalen;
-                        filePointer += datalen;
-                        if (remainingLen == 0) {
-                            System.out.println("Entire file sent");
+                        if (!fileSent) {
+                            index++;
+                            remainingLen -= datalen;
+                            filePointer += datalen;
+                            if (index == 255) {
+                                index = 0;
+                            }
+                            stop = true;
+                            if (remainingLen == 0) {
+                                System.out.println("Entire file sent");
+                                Integer[] stoppkt = new Integer[1];
+                                stoppkt[0] = -1;
+                                getNetworkLayer().sendPacket(stoppkt);
+                                fileSent = true;
+                                index = 255;
+                                stop = false;
+                            }
+                        } else {
+                            stop = true;
                             fileEnd = true;
                         }
-                        stop = true;
+
                     }
                 } catch (InterruptedException e) {
                     System.out.println("Interruption");
@@ -84,6 +101,7 @@ public class MyProtocol extends IRDTProtocol {
     @Override
     public void TimeoutElapsed(Object tag) {
         int z=(Integer)tag;
+        stop = true;
         // handle expiration of the timeout:
         System.out.println("Timer expired with tag="+z);
     }
@@ -95,6 +113,7 @@ public class MyProtocol extends IRDTProtocol {
         // create the array that will contain the file contents
         // note: we don't know yet how large the file will be, so the easiest (but not most efficient)
         //   is to reallocate the array every time we find out there's more data
+        HashSet<Integer> recvHeaders = new HashSet<>();
         Integer[] fileContents = new Integer[0];
 
         // loop until we are done receiving the file
@@ -112,15 +131,40 @@ public class MyProtocol extends IRDTProtocol {
                 System.out.println("Received packet, length="+packet.length+"  first byte="+packet[0] );
 
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
-                int oldlength=fileContents.length;
-                int datalen= packet.length - HEADERSIZE;
-                fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
-                System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                index = packet[0];
+                if (index == 255) {
+                    System.out.println("Entire file received!");
+                    Integer[] pkt = new Integer[1];
+                    pkt[0] = index;
+                    System.out.println("Sending ACK " + pkt[0]);
+                    getNetworkLayer().sendPacket(pkt);
+                    stop = true;
+                    continue;
+                } if (index == 254 && recvHeaders.isEmpty()) {
+                    System.out.println("Duplicate");
+                    Integer[] pkt = new Integer[1];
+                    pkt[0] = index;
+                    System.out.println("Sending ACK " + pkt[0]);
+                    getNetworkLayer().sendPacket(pkt);
+                    continue;
+                }
+                if (!recvHeaders.contains(index)) {
+                    int oldlength=fileContents.length;
+                    int datalen= packet.length - HEADERSIZE;
+                    fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
+                    System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                    recvHeaders.add(index);
+                }
                 Integer[] pkt = new Integer[1];
-                pkt[0] = packet[0];
+                pkt[0] = index;
                 System.out.println("Sending ACK " + pkt[0]);
                 getNetworkLayer().sendPacket(pkt);
-                index++;
+
+                if (recvHeaders.size() == 255) {
+                    System.out.println("Emptied hash set");
+                    recvHeaders.clear();
+                }
+
 
             }else{
                 // wait ~10ms (or however long the OS makes us wait) before trying again
@@ -130,9 +174,7 @@ public class MyProtocol extends IRDTProtocol {
                     stop = true;
                 }
             }
-            if (index == 2) {
-                stop = true;
-            }
+
         }
 
         // return the output file
