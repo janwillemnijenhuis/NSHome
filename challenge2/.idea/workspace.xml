@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="305806c0-ceb0-4c8c-8556-873dc71c61b2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../challenge1/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../challenge1/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/challenge2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/challenge2.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645001024659.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645002987690.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645003356252.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645004314852.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645004607330.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645004619002.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645004629807.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645011333268.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645011464917.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645011581796.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645013807307.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput1.1645015669847.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645004915606.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645005894995.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645006143725.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645008418969.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645008605664.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645008794333.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645010425082.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645010486666.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645010537262.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645010599753.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645010677831.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645013159539.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645013337146.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645013383161.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645013425692.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput2.1645013533587.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput3.1645007980124.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput5.1645007381818.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput5.1645008831755.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput5.1645009889828.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645011854157.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645025781443.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645026354862.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645026769728.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645028318798.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645028947950.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645029689998.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645030054576.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rdtcOutput6.1645030432209.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/checkstyle-idea.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/NSHome/framework/Utils$Timeout.class" beforeDir="false" afterPath="$PROJECT_DIR$/../out/production/NSHome/framework/Utils$Timeout.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/NSHome/framework/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/../out/production/NSHome/framework/Utils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/NSHome/my_protocol/MyProtocol.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../out/production/NSHome/my_protocol/Program.class" beforeDir="false" afterPath="$PROJECT_DIR$/../out/production/NSHome/my_protocol/Program.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rdtcOutput1.1644999231120.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rdtcOutput1.1645000059783.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rdtcOutput1.1645000340393.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rdtcOutput1.1645000663586.png" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="tiuk63d3" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="25BWKvRwFZ9P0TuaJZBwtZdcd5B" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\janwillem.nijenhuis\Documents\NSHome\challenge2\src" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="my_protocol" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Program" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="my_protocol.Program" />
+      <module name="challenge2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my_protocol.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Program" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="305806c0-ceb0-4c8c-8556-873dc71c61b2" name="Changes" comment="" />
+      <created>1645000900278</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1645000900278</updated>
+      <workItem from="1645000901498" duration="26008000" />
+      <workItem from="1645100227740" duration="17000" />
+      <workItem from="1645100286863" duration="53000" />
+      <workItem from="1645100353342" duration="34000" />
+      <workItem from="1645100429427" duration="241000" />
+      <workItem from="1645100928073" duration="66000" />
+      <workItem from="1645175247550" duration="12000" />
+      <workItem from="1645181316847" duration="1992000" />
+      <workItem from="1645427763502" duration="15000" />
+      <workItem from="1646141028609" duration="3000" />
+      <workItem from="1646141040652" duration="4000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+</project>
