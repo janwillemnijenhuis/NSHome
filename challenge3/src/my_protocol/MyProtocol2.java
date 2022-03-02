@@ -61,6 +61,10 @@ public class MyProtocol2 implements IMACProtocol {
             this.ids.add(lastSlotID);
         }
 
+        // get nothingToSend digit
+        boolean nothingToSend = Boolean.valueOf(controlInformationString.substring(3,4));
+
+
 
 
         // display the current number of frames in the queue
@@ -201,6 +205,11 @@ public class MyProtocol2 implements IMACProtocol {
     public int transmissionInfo(int frameCount, boolean somethingToSend) {
         int doneBit = somethingToSend ? 1 : 0;
         return frameCount*100 + this.id*10 + doneBit;
+
+
+    public int transmissionInfo(int frameCount, boolean somethingToSend) {
+        int doneBit = somethingToSend ? 1 : 0;
+        return frameCount*100 + ID*10 + doneBit;
     }
 
     public void generateID() {
