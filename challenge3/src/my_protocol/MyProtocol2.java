@@ -38,7 +38,7 @@ public class MyProtocol2 implements IMACProtocol {
     public UpdateQueue<Integer> window = new UpdateQueue(12);
     public int id;
     public HashSet<Integer> ids = new HashSet<>();
-    public int threshold = 6;
+    public int threshold = 4;
 
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState,
@@ -46,14 +46,21 @@ public class MyProtocol2 implements IMACProtocol {
 
         // controlInformation parsing:
         // add leading zeros to make fixed length of 3 digits
-        String controlInformationString = String.format("%03d", controlInformation);
+        String controlInformationString = String.format("%04d", controlInformation);
         // get ID (last digit)
         int lastSlotID = Integer.parseInt(controlInformationString.substring(2,3));
         // get framecount (first two digits)
         int lastSlotFrameCount = Integer.parseInt(controlInformationString.substring(0,2));
+        // get something to send bit
+        boolean somethingToSend = Boolean.valueOf(controlInformationString.substring(3,4));
 
-        updateQueue(lastSlotID);
-        this.ids.add(lastSlotID);
+        if (parsingClearToSend(previousMediumState) == 0) {
+            updateQueue(0);
+        } else {
+            updateQueue(lastSlotID);
+            this.ids.add(lastSlotID);
+        }
+
 
 
         // display the current number of frames in the queue
@@ -81,7 +88,13 @@ public class MyProtocol2 implements IMACProtocol {
                 && this.window.getAmt(this.id) < this.threshold) {
                 // the channel was free, we don't overkill the window and we did send DATA, so send the next data
                 return sendData();
-            } else if (this.RTS && parsingClearToSend(previousMediumState) == 0) {
+            } else if (this.RTS && parsingClearToSend(previousMediumState) == 2
+                && this.window.getAmt(this.id) >= this.threshold) {
+                return sendNothing();
+            }
+
+
+            else if (this.RTS && parsingClearToSend(previousMediumState) == 0) {
                 // a collision was detected, and we did send a RTS, so wait some random slots
                 if (!this.takingOver) {
                     this.wait = randomWaits();
@@ -97,8 +110,20 @@ public class MyProtocol2 implements IMACProtocol {
                 } else {
                     return sendNothing();
                 }
-            } else if (parsingClearToSend(previousMediumState) == 2 && ) {
-
+            } else if (parsingClearToSend(previousMediumState) == 2 && this.window.getAmt(lastSlotID) >= this.threshold) {
+                if (isLowest()) {
+                    for (int i = 1; i <=4; i++) {
+                        if (this.id != i) {
+                            if (this.window.getAmt(i) == this.window.getAmt(this.id)) {
+                                if (this.id < i) {
+                                    return sendData();
+                                }
+                            }
+                        }
+                    }
+                    return sendData();
+                }
+                return sendNothing();
             } else if (parsingClearToSend(previousMediumState) == 2 && controlInformation >=  this.aggressiveness * this.frameCount) {
                 // if the framecount of some sender is twice ours, and the previous transmission was success, transmit RTS
                 this.takingOver = true;
@@ -131,7 +156,7 @@ public class MyProtocol2 implements IMACProtocol {
 
     public TransmissionInfo sendNothing() {
         System.out.println("SENDING NOTHING");
-        return new TransmissionInfo(TransmissionType.Silent, transmissionInfo(this.window.getAmt(this.id)));
+        return new TransmissionInfo(TransmissionType.Silent, transmissionInfo(this.window.getAmt(this.id), false));
     }
 
     public TransmissionInfo sendData() {
@@ -142,7 +167,19 @@ public class MyProtocol2 implements IMACProtocol {
         this.RTS = true;
         this.frameCount += 1;
         this.sending = true;
-        return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.window.getAmt(this.id)));
+        return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.window.getAmt(this.id), true));
+    }
+
+    public TransmissionInfo sendNoData() {
+        if (this.id == 0) {
+            generateID();
+        }
+        System.out.println("CLEAR TO SEND - SENDING DATA");
+        this.RTS = true;
+        this.frameCount += 1;
+        this.sending = true;
+        return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.window.getAmt(this.id),false));
+
     }
 
 
@@ -161,8 +198,9 @@ public class MyProtocol2 implements IMACProtocol {
     }
 
 
-    public int transmissionInfo(int frameCount) {
-        return frameCount*10 + ID;
+    public int transmissionInfo(int frameCount, boolean somethingToSend) {
+        int doneBit = somethingToSend ? 1 : 0;
+        return frameCount*100 + this.id*10 + doneBit;
     }
 
     public void generateID() {
