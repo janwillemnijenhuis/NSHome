@@ -4,7 +4,6 @@ import framework.IMACProtocol;
 import framework.MediumState;
 import framework.TransmissionInfo;
 import framework.TransmissionType;
-
 import java.util.Random;
 
 /**
@@ -23,7 +22,7 @@ import java.util.Random;
  * in public places, to preserve the learning effect for future students. *
  **************************************************************************
  */
-public class MyProtocol implements IMACProtocol {
+public class MyProtocol2 implements IMACProtocol {
     public boolean RTS = false; // currently in requesting mode
     public boolean sending = false; // currently in sending mode, obtained CTS
     public int frameCount = 0;

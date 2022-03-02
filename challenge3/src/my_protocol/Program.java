@@ -20,7 +20,7 @@ public class Program {
     private static String groupToken = "fd4cf1a6-c60e-48c4-b7f6-24b935c677e0";
 
     // Change to your protocol implementation
-    private static IMACProtocol protocol = new MyProtocol();
+    private static IMACProtocol protocol = new MyProtocol2();
 
     // Challenge server address
     private static String serverAddress = "networkingchallenges.ewi.utwente.nl";
