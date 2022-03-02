@@ -4,6 +4,8 @@ import framework.IMACProtocol;
 import framework.MediumState;
 import framework.TransmissionInfo;
 import framework.TransmissionType;
+import java.util.ArrayList;
+import java.util.Queue;
 import java.util.Random;
 
 /**
@@ -32,8 +34,9 @@ public class MyProtocol2 implements IMACProtocol {
     public int m = 4; // max no of slots to wait
     public boolean takingOver = false;
     public double aggressiveness = 1.025;
-
-
+    public UpdateQueue<Integer> window = new UpdateQueue(12);
+    public int id;
+    public ArrayList<Integer> ids = new ArrayList<>();
 
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState,
@@ -134,7 +137,23 @@ public class MyProtocol2 implements IMACProtocol {
         return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.frameCount));
     }
 
+
+    public void updateQueue(int number) {
+        this.window.add(number);
+    }
+
+    public boolean isLowest() {
+        int count = this.window.getAmt(this.id);
+        for (int id: this.ids) {
+            if (this.window.getAmt(id) < count) {
+                return false;
+            }
+        }
+        return true;
+    }
     public int transmissionInfo(int frameCount) {
         return frameCount*10 + ID;
     }
+
 }
+
