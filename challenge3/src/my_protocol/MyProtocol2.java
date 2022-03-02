@@ -50,6 +50,9 @@ public class MyProtocol2 implements IMACProtocol {
         int lastSlotID = Integer.parseInt(controlInformationString.substring(2,3));
         // get framecount (first two digits)
         int lastSlotFrameCount = Integer.parseInt(controlInformationString.substring(0,2));
+        // get nothingToSend digit
+        boolean nothingToSend = Boolean.valueOf(controlInformationString.substring(3,4));
+
 
         // display the current number of frames in the queue
         System.out.println("CURRENT QUEUE LENGTH: " + localQueueLength);
@@ -153,9 +156,13 @@ public class MyProtocol2 implements IMACProtocol {
         return true;
     }
 
-
     public int transmissionInfo(int frameCount) {
-        return frameCount*10 + ID;
+        return frameCount * 10 + ID;
+    }
+
+    public int transmissionInfo(int frameCount, boolean somethingToSend) {
+        int doneBit = somethingToSend ? 1 : 0;
+        return frameCount*100 + ID*10 + doneBit;
     }
 
     public void generateID() {
