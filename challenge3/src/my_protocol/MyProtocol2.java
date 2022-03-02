@@ -23,6 +23,7 @@ import java.util.Random;
  **************************************************************************
  */
 public class MyProtocol2 implements IMACProtocol {
+    public int ID;
     public boolean RTS = false; // currently in requesting mode
     public boolean sending = false; // currently in sending mode, obtained CTS
     public int frameCount = 0;
@@ -37,6 +38,14 @@ public class MyProtocol2 implements IMACProtocol {
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState,
                                               int controlInformation, int localQueueLength) {
+
+        // controlInformation parsing:
+            // add leading zeros to make fixed length of 3 digits
+            String controlInformationString = String.format("%03d", controlInformation);
+            // get ID (last digit)
+            int lastSlotID = Integer.parseInt(controlInformationString.substring(2,3));
+            // get framecount (first two digits)
+            int lastSlotFrameCount = Integer.parseInt(controlInformationString.substring(0,2));
 
         // display the current number of frames in the queue
         System.out.println("CURRENT QUEUE LENGTH: " + localQueueLength);
@@ -110,19 +119,22 @@ public class MyProtocol2 implements IMACProtocol {
     public TransmissionInfo sendRTS() {
         this.RTS = true;
         System.out.println("SENDING RTS - requesting to send data");
-        return new TransmissionInfo(TransmissionType.Data, this.frameCount);
+        return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.frameCount));
     }
 
     public TransmissionInfo sendNothing() {
         System.out.println("SENDING NOTHING");
-        return new TransmissionInfo(TransmissionType.Silent, this.frameCount);
+        return new TransmissionInfo(TransmissionType.Silent, transmissionInfo(this.frameCount));
     }
 
     public TransmissionInfo sendData() {
         System.out.println("CLEAR TO SEND - SENDING DATA");
         this.frameCount += 1;
         this.sending = true;
-        return new TransmissionInfo(TransmissionType.Data, this.frameCount);
+        return new TransmissionInfo(TransmissionType.Data, transmissionInfo(this.frameCount));
     }
 
+    public int transmissionInfo(int frameCount) {
+        return frameCount*10 + ID;
+    }
 }
