@@ -24,25 +24,105 @@ import java.util.Random;
  **************************************************************************
  */
 public class MyProtocol implements IMACProtocol {
+    public boolean RTS = false; // currently in requesting mode
+    public boolean sending = false; // currently in sending mode, obtained CTS
+    public int frameCount = 0;
+    public int wait = 0; // the current amount of waits
+    public int p = 25; // probability of transmitting a RTS
+    public int m = 4; // max no of slots to wait
+    public boolean takingOver = false;
+
+
 
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState,
                                               int controlInformation, int localQueueLength) {
-        // No data to send, just be quiet
+
+        // display the current number of frames in the queue
+        System.out.println("CURRENT QUEUE LENGTH: " + localQueueLength);
+        System.out.println("CONTROL INFORMATION: " + controlInformation);
+
+        // if there is no data, don't send anything
         if (localQueueLength == 0) {
-            System.out.println("SLOT - No data to send.");
-            return new TransmissionInfo(TransmissionType.Silent, 0);
+            System.out.println("EMPTY QUEUE - No data to send.");
+            this.RTS = false;
+            this.sending = false;
+            return sendNothing();
+        } else if (this.sending) {
+            if (previousMediumState != MediumState.Succes) {
+                // collision detected in previous round, wait some random slots before sending again
+                this.wait = randomWaits();
+                this.RTS = false;
+                this.sending = false;
+                System.out.println("SETTING WAIT TO: " + this.wait);
+            }
         }
 
-        // Randomly transmit with 60% probability
-        if (new Random().nextInt(100) < 60) {
-            System.out.println("SLOT - Sending data and hope for no collision.");
-            return new TransmissionInfo(TransmissionType.Data, 0);
+        if (this.wait == 0) {
+            if (this.RTS && parsingClearToSend(previousMediumState) == 2) {
+                // the channel was free, and we did send DATA, so send the next data
+                return sendData();
+            } else if (this.RTS && parsingClearToSend(previousMediumState) == 0) {
+                // a collision was detected, and we did send a RTS, so wait some random slots
+                if (!this.takingOver) {
+                    this.wait = randomWaits();
+                    this.RTS = false;
+                    return sendNothing();
+                } else {
+                    return sendData();
+                }
+            } else if (parsingClearToSend(previousMediumState) == 1) {
+                // the channel is idle, transmit RTS with probability p
+                if (new Random().nextInt(100) < this.p) {
+                    return sendRTS();
+                } else {
+                    return sendNothing();
+                }
+            } else if (parsingClearToSend(previousMediumState) == 2 && controlInformation >=  1.03* this.frameCount) {
+                // if the framecount of some sender is twice ours, and the previous transmission was success, transmit RTS
+                this.takingOver = true;
+                return sendRTS();
+            }
+
+            else {
+                // the channel is occupied or a collision was detected, don't send anything
+                return sendNothing();
+            }
         } else {
-            System.out.println("SLOT - Not sending data to give room for others.");
-            return new TransmissionInfo(TransmissionType.Silent, 0);
+            // we're currently waiting until our waits have passed
+            this.wait--;
+            return sendNothing();
         }
+    }
 
+    public int parsingClearToSend(MediumState previousMediumState) {
+        return switch (previousMediumState) {
+            case Succes -> 2;
+            case Collision -> 0;
+            case Idle -> 1;
+        };
+    }
+
+    public int randomWaits() {
+        return (int) (Math.random() * this.m);
+    }
+
+    public TransmissionInfo sendRTS() {
+        this.RTS = true;
+        System.out.println("SENDING RTS - requesting to send data");
+        return new TransmissionInfo(TransmissionType.Data, this.frameCount);
+    }
+
+    public TransmissionInfo sendNothing() {
+        System.out.println("SENDING NOTHING");
+        return new TransmissionInfo(TransmissionType.Silent, this.frameCount);
+    }
+
+    public TransmissionInfo sendData() {
+        System.out.println("CLEAR TO SEND - SENDING DATA");
+        this.frameCount += 1;
+        this.sending = true;
+        return new TransmissionInfo(TransmissionType.Data, this.frameCount);
     }
 
 }

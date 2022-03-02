@@ -17,7 +17,7 @@ import java.io.InputStream;
 public class Program {
 
     // Change to your group authentication token
-    private static String groupToken = "get-your-token-from-the-website";
+    private static String groupToken = "fd4cf1a6-c60e-48c4-b7f6-24b935c677e0";
 
     // Change to your protocol implementation
     private static IMACProtocol protocol = new MyProtocol();
