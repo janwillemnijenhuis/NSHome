@@ -22,13 +22,14 @@ import java.util.Random;
  * In particular, a correct solution to the challenge must NOT be posted  *
  * in public places, to preserve the learning effect for future students. *
  **************************************************************************
+ * Job Logmans s2331179 & Jan Willem Nijenhuis s2935511
  */
 public class MyProtocol implements IMACProtocol {
     public boolean RTS = false; // currently in requesting mode
     public boolean sending = false; // currently in sending mode, obtained CTS
     public int frameCount = 0;
     public int wait = 0; // the current amount of waits
-    public int p = 50; // probability of transmitting a RTS
+    public int p = 40; // probability of transmitting a RTS
     public int m = 4; // max no of slots to wait
     public boolean takingOver = false;
     public double aggressiveness = 1.025;
