@@ -29,10 +29,13 @@ public class MyProtocol implements IMACProtocol {
     public boolean sending = false; // currently in sending mode, obtained CTS
     public int frameCount = 0;
     public int wait = 0; // the current amount of waits
-    public int p = 40; // probability of transmitting a RTS
+    public int p = 25; // probability of transmitting a RTS
     public int m = 4; // max no of slots to wait
     public boolean takingOver = false;
-    public double aggressiveness = 1.025;
+    public double aggressiveness = 1.05;
+    public int streak = 0;
+    public int currentCount = 0;
+    public int threshold = 12;
 
 
 
@@ -43,6 +46,15 @@ public class MyProtocol implements IMACProtocol {
         // display the current number of frames in the queue
         System.out.println("CURRENT QUEUE LENGTH: " + localQueueLength);
         System.out.println("CONTROL INFORMATION: " + controlInformation);
+
+        if (controlInformation == this.currentCount + 1) {
+            this.streak += 1;
+        } else if (controlInformation != 0) {
+            this.streak = 1;
+        } else {
+            this.streak = 0;
+        }
+        this.currentCount = controlInformation;
 
         // if there is no data, don't send anything
         if (localQueueLength == 0) {
@@ -63,7 +75,14 @@ public class MyProtocol implements IMACProtocol {
         if (this.wait == 0) {
             if (this.RTS && parsingClearToSend(previousMediumState) == 2) {
                 // the channel was free, and we did send DATA, so send the next data
-                return sendData();
+                if (this.streak < this.threshold) {
+                    return sendData();
+                } else {
+                    this.RTS = false;
+                    this.sending = false;
+                    this.wait = randomWaits();
+                    return sendNothing();
+                }
             } else if (this.RTS && parsingClearToSend(previousMediumState) == 0) {
                 // a collision was detected, and we did send a RTS, so wait some random slots
                 if (!this.takingOver) {
@@ -80,6 +99,9 @@ public class MyProtocol implements IMACProtocol {
                 } else {
                     return sendNothing();
                 }
+            } else if (parsingClearToSend(previousMediumState) == 2 && this.streak >= this.threshold) {
+                this.takingOver = true;
+                return sendRTS();
             } else if (parsingClearToSend(previousMediumState) == 2 && controlInformation >=  this.aggressiveness * this.frameCount) {
                 // if the framecount of some sender is twice ours, and the previous transmission was success, transmit RTS
                 this.takingOver = true;
@@ -106,7 +128,7 @@ public class MyProtocol implements IMACProtocol {
     }
 
     public int randomWaits() {
-        return (int) (Math.random() * this.m);
+        return (int) (Math.random() * this.m) + 1;
     }
 
     public TransmissionInfo sendRTS() {
