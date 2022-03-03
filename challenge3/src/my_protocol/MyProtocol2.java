@@ -24,6 +24,7 @@ import java.util.Random;
  * In particular, a correct solution to the challenge must NOT be posted  *
  * in public places, to preserve the learning effect for future students. *
  **************************************************************************
+ * Job Logmans s2331179 & Jan Willem Nijenhuis s2935511
  */
 public class MyProtocol2 implements IMACProtocol {
     public int ID;
@@ -31,14 +32,14 @@ public class MyProtocol2 implements IMACProtocol {
     public boolean sending = false; // currently in sending mode, obtained CTS
     public int frameCount = 0;
     public int wait = 0; // the current amount of waits
-    public int p = 50; // probability of transmitting a RTS
+    public int p = 25; // probability of transmitting a RTS
     public int m = 4; // max no of slots to wait
     public boolean takingOver = false;
     public double aggressiveness = 1.025;
     public UpdateQueue<Integer> window = new UpdateQueue(12);
     public int id;
     public HashSet<Integer> ids = new HashSet<>();
-    public int threshold = 4;
+    public int threshold = 10;
 
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState,
@@ -61,12 +62,7 @@ public class MyProtocol2 implements IMACProtocol {
             this.ids.add(lastSlotID);
         }
 
-        // get nothingToSend digit
-        boolean nothingToSend = Boolean.valueOf(controlInformationString.substring(3,4));
-
-
-
-
+        System.out.println(this.id);
         // display the current number of frames in the queue
         System.out.println("CURRENT QUEUE LENGTH: " + localQueueLength);
         System.out.println("CONTROL INFORMATION: " + controlInformation);
@@ -94,6 +90,7 @@ public class MyProtocol2 implements IMACProtocol {
                 return sendData();
             } else if (this.RTS && parsingClearToSend(previousMediumState) == 2
                 && this.window.getAmt(this.id) >= this.threshold) {
+                this.wait = randomWaits();
                 return sendNothing();
             }
 
@@ -205,11 +202,6 @@ public class MyProtocol2 implements IMACProtocol {
     public int transmissionInfo(int frameCount, boolean somethingToSend) {
         int doneBit = somethingToSend ? 1 : 0;
         return frameCount*100 + this.id*10 + doneBit;
-
-
-    public int transmissionInfo(int frameCount, boolean somethingToSend) {
-        int doneBit = somethingToSend ? 1 : 0;
-        return frameCount*100 + ID*10 + doneBit;
     }
 
     public void generateID() {

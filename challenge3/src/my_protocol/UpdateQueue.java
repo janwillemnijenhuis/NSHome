@@ -2,6 +2,10 @@ package my_protocol;
 
 import java.util.ArrayList;
 
+/**
+ * Job Logmans s2331179 & Jan Willem Nijenhuis s2935511
+ * @param <E>
+ */
 public class UpdateQueue<E> extends ArrayList<E> {
     private int size;
 
