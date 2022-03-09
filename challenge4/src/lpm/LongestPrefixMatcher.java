@@ -44,14 +44,15 @@ public class LongestPrefixMatcher {
         // TODO: Look up this route
         for (int i = 0; i < this.ip.size(); i++) {
             int pf = this.ip.get(i)>>(32-(this.prefix.get(i)));
-            int result = pf&ip;
-            if(result==11111){
-
+            int result = pf^ip;
+            if(result==0 && this.prefix.get(i) > this.bestLength){
+                this.bestPort = this.port.get(i);
+                this.bestLength = this.prefix.get(i);
             }
 
         }
 
-        return -1;
+        return bestPort;
     }
 
     /**
