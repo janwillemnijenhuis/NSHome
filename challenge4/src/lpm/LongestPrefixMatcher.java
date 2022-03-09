@@ -22,8 +22,11 @@ import java.util.Comparator;
 public class LongestPrefixMatcher {
 
     public ArrayList<int[]> ip;
-    public ArrayList<Byte> prefix;
+    public ArrayList<Integer> ips;
+    public ArrayList<Integer> prefix;
     public ArrayList<Integer> port;
+    public ArrayList<Integer> ids;
+    public ArrayList<ArrayList<ArrayList<Integer>>> ms;
 
     public int bestPort;
     public int bestLength;
@@ -35,8 +38,12 @@ public class LongestPrefixMatcher {
         this.ip = new ArrayList<>() ;
         this.prefix = new ArrayList<>();
         this.port = new ArrayList<>();
+        this.ips = new ArrayList<>();
+        this.ids = new ArrayList<>();
         this.bestPort = -1;
         this.bestLength = 0;
+
+        this.ms = new ArrayList<>();
     }
 
     /**
@@ -46,14 +53,19 @@ public class LongestPrefixMatcher {
      */
     public int lookup(int ip) {
         // TODO: Look up this route
-        for (int i = 0; i < this.ip.size(); i++) {
-            int[] thisIp = this.ip.get(i);
-            System.out.println(thisIp[1]);
-            int pf = thisIp[0]>>(32-(thisIp[1]));
-            int compare = ip >> (32-(thisIp[1]));
-            int result = pf^compare;
-            if(result==0){
-                return thisIp[2];
+
+
+        int humanIP = Integer.parseInt(ipToHuman(ip).split("\\.")[0]);
+
+        for (int i = 0; i < this.ips.size(); i++) {
+            if (this.ids.get(i) == humanIP) {
+                int prefix = this.prefix.get(i);
+                int pf = this.ips.get(i) >> (32 - (this.prefix.get(i)));
+                int compare = ip >> (32 - (this.prefix.get(i)));
+                int result = pf ^ compare;
+                if (result == 0) {
+                    return this.port.get(i);
+                }
             }
         }
         return -1;
@@ -68,11 +80,11 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
-        int[] item = new int[3];
+        int[] item = new int[4];
         item[0] = ip;
         item[1] = prefixLength;
         item[2] = portNumber;
-
+        item[3] = Integer.parseInt(ipToHuman(ip).split("\\.")[0]);
         this.ip.add(item);
 
     }
@@ -96,6 +108,14 @@ public class LongestPrefixMatcher {
                 }
             }
         });
+        System.out.println(this.ip.get(0)[1]);
+        for (int i = 0; i < this.ip.size(); i++) {
+            int[] thisIP = this.ip.get(i);
+            this.ips.add(thisIP[0]);
+            this.prefix.add(thisIP[1]);
+            this.port.add(thisIP[2]);
+            this.ids.add(thisIP[3]);
+        }
     }
 
     /**
