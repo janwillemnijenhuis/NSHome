@@ -3,4 +3,5 @@
   <component name="KotlinMultiplatform">
     <allAvailableExecutables />
   </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_13" project-jdk-name="azul-15" project-jdk-type="JavaSDK" />
 </project>
