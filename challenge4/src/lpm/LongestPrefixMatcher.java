@@ -15,14 +15,28 @@
 
 package lpm;
 
+import java.util.ArrayList;
+
 public class LongestPrefixMatcher {
-  /**
-   * You can use this function to initialize variables.
-   */
+
+    public ArrayList<Integer> ip;
+    public ArrayList<Byte> prefix;
+    public ArrayList<Integer> port;
+
+    public int bestPort;
+    public int bestLength;
+
+    /**
+     * You can use this function to initialize variables.
+     */
     public LongestPrefixMatcher() {
-        
+        this.ip = new ArrayList<>() ;
+        this.prefix = new ArrayList<>();
+        this.port = new ArrayList<>();
+        this.bestPort = -1;
+        this.bestLength = 0;
     }
-    
+
     /**
      * Looks up an IP address in the routing tables
      * @param ip The IP address to be looked up in integer representation
@@ -30,7 +44,20 @@ public class LongestPrefixMatcher {
      */
     public int lookup(int ip) {
         // TODO: Look up this route
-        return -1;
+        for (int i = 0; i < this.ip.size(); i++) {
+            int pf = this.ip.get(i)>>(32-(this.prefix.get(i)));
+            int compare = ip >> (32-(this.prefix.get(i)));
+            int result = pf^compare;
+            if(result==0 && this.prefix.get(i) > this.bestLength){
+                this.bestPort = this.port.get(i);
+                this.bestLength = this.prefix.get(i);
+            }
+
+        }
+        int result = this.bestPort;
+        this.bestLength = 0;
+        this.bestPort = -1;
+        return result;
     }
 
     /**
@@ -42,6 +69,9 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
+        this.ip.add(ip);
+        this.prefix.add(prefixLength);
+        this.port.add(portNumber);
     }
 
     /**
@@ -50,7 +80,7 @@ public class LongestPrefixMatcher {
      * organize the routing information, if your datastructure requires this.
      */
     public void finalizeRoutes() {
-        // TODO: Optionally do something     
+        // TODO: Optionally do something
     }
 
     /**
@@ -60,9 +90,9 @@ public class LongestPrefixMatcher {
      */
     private String ipToHuman(int ip) {
         return Integer.toString(ip >> 24 & 0xff) + "." +
-                Integer.toString(ip >> 16 & 0xff) + "." +
-                Integer.toString(ip >> 8 & 0xff) + "." +
-                Integer.toString(ip & 0xff);
+            Integer.toString(ip >> 16 & 0xff) + "." +
+            Integer.toString(ip >> 8 & 0xff) + "." +
+            Integer.toString(ip & 0xff);
     }
 
     /**
