@@ -15,12 +15,24 @@
 
 package lpm;
 
+import java.util.ArrayList;
+
 public class LongestPrefixMatcher {
+
+    public ArrayList<Integer> ip;
+    public ArrayList<Byte> prefix;
+    public ArrayList<Integer> port;
+
+    public int bestPort =-1;
+    public int bestLength;
+
   /**
    * You can use this function to initialize variables.
    */
     public LongestPrefixMatcher() {
-        
+        this.ip = new ArrayList<>() ;
+        this.prefix = new ArrayList<>();
+        this.port = new ArrayList<>();
     }
     
     /**
@@ -30,6 +42,15 @@ public class LongestPrefixMatcher {
      */
     public int lookup(int ip) {
         // TODO: Look up this route
+        for (int i = 0; i < this.ip.size(); i++) {
+            int pf = this.ip.get(i)>>(32-(this.prefix.get(i)));
+            int result = pf&ip;
+            if(result==11111){
+
+            }
+
+        }
+
         return -1;
     }
 
@@ -42,6 +63,11 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
+        this.ip.add(ip);
+        this.prefix.add(prefixLength);
+        this.port.add(portNumber);
+
+
     }
 
     /**
