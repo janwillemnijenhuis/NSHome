@@ -29,8 +29,9 @@ public class Framework {
 
     public static void main(String[] args) {
         Framework client = new Framework();
-        
+        long start = System.currentTimeMillis();
         client.readRoutes(ROUTES_FILE);
+        System.out.println((System.currentTimeMillis() - start));
         
         if (client.readLookup(LOOKUP_FILE, OUTPUT_FILE)) {
             System.out.println("All lookups done successfully.");
