@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class LongestPrefixMatcher {
 
-    public ArrayList<Integer> ip;
+    public ArrayList<int[]> ip;
     public ArrayList<Byte> prefix;
     public ArrayList<Integer> port;
 
@@ -52,7 +52,6 @@ public class LongestPrefixMatcher {
                 this.bestPort = this.port.get(i);
                 this.bestLength = this.prefix.get(i);
             }
-
         }
         int result = this.bestPort;
         this.bestLength = 0;
@@ -69,7 +68,10 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
-        this.ip.add(ip);
+        int[] item = new int[2];
+        item[0] = ip>>(32-prefixLength);
+        item[1] = portNumber;
+        this.ip.add(item);
         this.prefix.add(prefixLength);
         this.port.add(portNumber);
     }
@@ -81,6 +83,7 @@ public class LongestPrefixMatcher {
      */
     public void finalizeRoutes() {
         // TODO: Optionally do something
+
     }
 
     /**
