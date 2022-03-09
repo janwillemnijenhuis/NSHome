@@ -16,6 +16,8 @@
 package lpm;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class LongestPrefixMatcher {
 
@@ -45,18 +47,16 @@ public class LongestPrefixMatcher {
     public int lookup(int ip) {
         // TODO: Look up this route
         for (int i = 0; i < this.ip.size(); i++) {
-            int pf = this.ip.get(i)>>(32-(this.prefix.get(i)));
-            int compare = ip >> (32-(this.prefix.get(i)));
+            int[] thisIp = this.ip.get(i);
+            System.out.println(thisIp[1]);
+            int pf = thisIp[0]>>(32-(thisIp[1]));
+            int compare = ip >> (32-(thisIp[1]));
             int result = pf^compare;
-            if(result==0 && this.prefix.get(i) > this.bestLength){
-                this.bestPort = this.port.get(i);
-                this.bestLength = this.prefix.get(i);
+            if(result==0){
+                return thisIp[2];
             }
         }
-        int result = this.bestPort;
-        this.bestLength = 0;
-        this.bestPort = -1;
-        return result;
+        return -1;
     }
 
     /**
@@ -68,12 +68,13 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
-        int[] item = new int[2];
-        item[0] = ip>>(32-prefixLength);
-        item[1] = portNumber;
+        int[] item = new int[3];
+        item[0] = ip;
+        item[1] = prefixLength;
+        item[2] = portNumber;
+
         this.ip.add(item);
-        this.prefix.add(prefixLength);
-        this.port.add(portNumber);
+
     }
 
     /**
@@ -83,7 +84,18 @@ public class LongestPrefixMatcher {
      */
     public void finalizeRoutes() {
         // TODO: Optionally do something
-
+        Collections.sort(this.ip, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if(o1[1] < o2[1]){
+                    return 1;
+                } else if (o1[1]>o2[1]) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
     }
 
     /**
