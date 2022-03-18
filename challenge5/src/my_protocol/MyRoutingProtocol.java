@@ -2,6 +2,7 @@ package my_protocol;
 
 import framework.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import java.util.Map;
  */
 public class MyRoutingProtocol implements IRoutingProtocol {
     private LinkLayer linkLayer;
+    private int myAddress;
 
     // You can use this data structure to store your routing table.
     private HashMap<Integer, MyRoute> myRoutingTable = new HashMap<>();
@@ -27,61 +29,62 @@ public class MyRoutingProtocol implements IRoutingProtocol {
     @Override
     public void init(LinkLayer linkLayer) {
         this.linkLayer = linkLayer;
+        this.myAddress = this.linkLayer.getOwnAddress();
+        MyRoute myRoute = new MyRoute();
+        myRoute.nextHop = this.myAddress;
+        myRoute.cost = 0;
+        this.myRoutingTable.put(this.myAddress, myRoute);
     }
 
 
     @Override
     public void tick(PacketWithLinkCost[] packetsWithLinkCosts) {
         // Get the address of this node
-        int myAddress = this.linkLayer.getOwnAddress();
 
         System.out.println("tick; received " + packetsWithLinkCosts.length + " packets");
         int i;
+
+        DataTable myDT = new DataTable(6);
 
         // first process the incoming packets; loop over them:
         for (i = 0; i < packetsWithLinkCosts.length; i++) {
             Packet packet = packetsWithLinkCosts[i].getPacket();
             int neighbour = packet.getSourceAddress();             // from whom is the packet?
             int linkcost = packetsWithLinkCosts[i].getLinkCost();  // what's the link cost from/to this neighbour?
-            DataTable dt = packet.getDataTable();                  // other data contained in the packet
+            DataTable dt = packet.getDataTable();
+            System.out.println("[RECEIVED DT]: " + Arrays.toString(dt.getRow(0)));
             System.out.printf("received packet from %d with %d rows and %d columns of data%n", neighbour, dt.getNRows(), dt.getNColumns());
 
-            // you'll probably want to process the data, update your data structures (myRoutingTable) , etc....
-
-            // reading one cell from the DataTable can be done using the  dt.get(row,column)  method
-
-           /* example code for inserting a route into myRoutingTable:
-               MyRoute r = new MyRoute();
-               r.nextHop = ...someneighbour...;
-               myRoutingTable.put(...somedestination... , r);
-           */
-
-           /* example code for checking whether some destination is already in myRoutingTable, and accessing it:
-               if (myRoutingTable.containsKey(dest)) {
-                   MyRoute r = myRoutingTable.get(dest);
-                   // do something with r.cost and r.nextHop; you can even modify them
-               }
-           */
-
+            Integer[] row = dt.getRow(0);
+            for (int j = 0; j<row.length; j++) {
+                int cost = row[j];
+                if (this.myRoutingTable.get(j+1) != null) {
+                    if (cost < this.myRoutingTable.get(j + 1).cost) {
+                        MyRoute myRoute = new MyRoute();
+                        myRoute.cost = linkcost + cost;
+                        myRoute.nextHop = neighbour;
+                        this.myRoutingTable.put(j + 1, myRoute);
+                    }
+                } else {
+                    MyRoute myRoute = new MyRoute();
+                    myRoute.cost = linkcost + cost;
+                    myRoute.nextHop = neighbour;
+                    this.myRoutingTable.put(j + 1, myRoute);
+                }
+            }
         }
+        for (int k = 1; k<=6; k++) {
+            MyRoute route = this.myRoutingTable.get(k);
+            if (route != null) {
+                myDT.set(0, k-1, route.cost);
+            } else {
+                myDT.set(0, k-1, 1000);
+            }
+        }
+        System.out.println("[SENDING DT: " + this.myAddress + "] : " + Arrays.toString(myDT.getRow(0)));
 
-        // and send out one (or more, if you want) distance vector packets
-        // the actual distance vector data must be stored in the DataTable structure
-        DataTable dt = new DataTable(6);   // the 6 is the number of columns, you can change this
-        // you'll probably want to put some useful information into dt here
-        // by using the  dt.set(row, column, value)  method.
-
-        // next, actually send out the packet, with our own address as the source address
-        // and 0 as the destination address: that's a broadcast to be received by all neighbours.
-        Packet pkt = new Packet(myAddress, 0, dt);
+        Packet pkt = new Packet(myAddress, 0, myDT);
         this.linkLayer.transmit(pkt);
-
-        /*
-        Instead of using Packet with a DataTable you may also use Packet with
-        a byte[] as data part, if you really want to send your own data structure yourself.
-        Read the JavaDoc of Packet to see how you can do this.
-        PLEASE NOTE! Although we provide this option we do not support it.
-        */
     }
 
     public Map<Integer, Integer> getForwardingTable() {
