@@ -22,18 +22,26 @@ import java.util.Map;
 public class MyRoutingProtocol implements IRoutingProtocol {
     private LinkLayer linkLayer;
     private int myAddress;
+    private static final int NODES = 6;
+    private static final int INF = 1000; // represents infinite, as 100 is the highest cost link we dont expect to go over this
 
     // You can use this data structure to store your routing table.
     private HashMap<Integer, MyRoute> myRoutingTable = new HashMap<>();
+    private DataTable myTable = new DataTable(6);
 
     @Override
     public void init(LinkLayer linkLayer) {
         this.linkLayer = linkLayer;
         this.myAddress = this.linkLayer.getOwnAddress();
-        MyRoute myRoute = new MyRoute();
-        myRoute.nextHop = this.myAddress;
-        myRoute.cost = 0;
-        this.myRoutingTable.put(this.myAddress, myRoute);
+        updateMyRoutingTable(0, this.myAddress, this.myAddress);
+        for (int i = 1; i <=NODES; i++) {
+            Integer[] values = new Integer[NODES];
+            Arrays.fill(values, INF);
+            if (i == this.myAddress) {
+                values[i-1] = 0;
+            }
+            this.myTable.setRow(i-1, values);
+        }
     }
 
 
@@ -44,7 +52,7 @@ public class MyRoutingProtocol implements IRoutingProtocol {
         System.out.println("tick; received " + packetsWithLinkCosts.length + " packets");
         int i;
 
-        DataTable myDT = new DataTable(6);
+        DataTable myDT = new DataTable(NODES);
 
         // first process the incoming packets; loop over them:
         for (i = 0; i < packetsWithLinkCosts.length; i++) {
@@ -52,39 +60,56 @@ public class MyRoutingProtocol implements IRoutingProtocol {
             int neighbour = packet.getSourceAddress();             // from whom is the packet?
             int linkcost = packetsWithLinkCosts[i].getLinkCost();  // what's the link cost from/to this neighbour?
             DataTable dt = packet.getDataTable();
-            System.out.println("[RECEIVED DT]: " + Arrays.toString(dt.getRow(0)));
             System.out.printf("received packet from %d with %d rows and %d columns of data%n", neighbour, dt.getNRows(), dt.getNColumns());
+            System.out.println("[RECEIVING DT] : \n" + dataTableToString(dt));
 
-            Integer[] row = dt.getRow(0);
-            for (int j = 0; j<row.length; j++) {
-                int cost = row[j];
-                if (this.myRoutingTable.get(j+1) != null) {
-                    if (cost < this.myRoutingTable.get(j + 1).cost) {
-                        MyRoute myRoute = new MyRoute();
-                        myRoute.cost = linkcost + cost;
-                        myRoute.nextHop = neighbour;
-                        this.myRoutingTable.put(j + 1, myRoute);
+            for (int l = 0; l<dt.getNRows(); l++) {
+                Integer[] row = dt.getRow(l);
+                if (l == neighbour - 1) {
+                    for (int j = 0; j < row.length; j++) {
+                        int cost = row[j];
+                        if (this.myRoutingTable.get(j + 1) != null) {
+                            if (cost + linkcost < this.myRoutingTable.get(j + 1).cost) {
+                                updateMyRoutingTable(linkcost + cost, neighbour, j + 1);
+                            }
+                        } else {
+                            updateMyRoutingTable(linkcost + cost, neighbour, j + 1);
+                        }
                     }
-                } else {
-                    MyRoute myRoute = new MyRoute();
-                    myRoute.cost = linkcost + cost;
-                    myRoute.nextHop = neighbour;
-                    this.myRoutingTable.put(j + 1, myRoute);
+                }
+                if (l != myAddress - 1) {
+                    myTable.setRow(l, row);
                 }
             }
         }
-        for (int k = 1; k<=6; k++) {
+        for (int k = 1; k<=NODES; k++) {
             MyRoute route = this.myRoutingTable.get(k);
             if (route != null) {
-                myDT.set(0, k-1, route.cost);
+                myTable.set(this.myAddress-1, k-1, route.cost);
             } else {
-                myDT.set(0, k-1, 1000);
+                myTable.set(this.myAddress, k-1, INF);
             }
         }
-        System.out.println("[SENDING DT: " + this.myAddress + "] : " + Arrays.toString(myDT.getRow(0)));
+        System.out.println("[SENDING DT: " + this.myAddress + "] : \n" + dataTableToString(myTable));
 
-        Packet pkt = new Packet(myAddress, 0, myDT);
+
+        Packet pkt = new Packet(myAddress, 0, myTable);
         this.linkLayer.transmit(pkt);
+    }
+
+    public String dataTableToString(DataTable dt) {
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i<NODES; i++) {
+            s.append(Arrays.toString(dt.getRow(i))).append("\n");
+        }
+        return s.toString();
+    }
+
+    public void updateMyRoutingTable(int cost, int nextHop, int node) {
+        MyRoute myRoute = new MyRoute();
+        myRoute.cost = cost;
+        myRoute.nextHop = nextHop;
+        this.myRoutingTable.put(node, myRoute);
     }
 
     public Map<Integer, Integer> getForwardingTable() {
