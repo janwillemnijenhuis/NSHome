@@ -17,4 +17,9 @@ package my_protocol;
 public class MyRoute {
     public int nextHop;
     public int cost;
+    public int TTL;
+
+    public MyRoute() {
+        this.TTL = 1;
+    }
 }
