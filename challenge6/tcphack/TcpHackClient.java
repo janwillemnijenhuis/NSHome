@@ -5,8 +5,8 @@ import java.net.*;
 import java.util.concurrent.*;
 
 class TcpHackClient {
-	public static final String CON_IP = "2001:610:1908:ff02:f57a:c534:9c8c:fbd4";
-	public static final int CON_PORT = 7710;
+	public static final String CON_IP = "127.0.0.1";
+	public static final int CON_PORT = 1234;
 
 	private BlockingQueue<Byte[]> packetQueue = new LinkedBlockingQueue<Byte[]>();
 
