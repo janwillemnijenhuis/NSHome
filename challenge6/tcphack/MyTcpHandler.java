@@ -2,8 +2,12 @@ package ns.tcphack;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 class MyTcpHandler extends TcpHandler {
+	private int[] txpkt;
+	private boolean sync;
+
 	public static void main(String[] args) {
 		new MyTcpHandler();
 	}
@@ -14,7 +18,7 @@ class MyTcpHandler extends TcpHandler {
 		boolean done = false;
 
 		// array of bytes in which we're going to build our packet:
-		int[] txpkt = new int[60];		// 40 bytes long for now, may need to expand this later
+		txpkt = new int[60];		// 40 bytes long for now, may need to expand this later
 
 		txpkt[0] = 0x60;	// first byte of the IPv6 header contains version number in upper nibble
 		// fill in the rest of the packet yourself...:
@@ -68,9 +72,9 @@ class MyTcpHandler extends TcpHandler {
 		// 0000010011010010 scr port
 		txpkt[40] = 0b00000100;
 		txpkt[41] = 0b11010010;
-		// 0001111000011110  dest port
+		// 0001111000011110 0001111000011111 0001111000100000 dest port
 		txpkt[42] = 0b00011110;
-		txpkt[43] = 0b00011110;
+		txpkt[43] = 0b00011111;
 		// sequence number
 		txpkt[44] = txpkt[45] = txpkt[46] = 0;
 		txpkt[47] = 0;
@@ -97,24 +101,88 @@ class MyTcpHandler extends TcpHandler {
 				continue;
 			}
 
-			// something has been received
-			int len=rxpkt.length;
+			int fin = rxpkt[53];
+			if (fin == 0b00010001) {
+				int[] newpkt = sendAckOnSynAck(this.txpkt, rxpkt);
+				this.sendData(newpkt);
+				newpkt = sendFin(this.txpkt, rxpkt);
+				this.sendData(newpkt);
+			}
 
-			// print the received bytes:
-			int i;
-			System.out.print("Received "+len+" bytes: ");
-			System.out.println(Integer.toBinaryString(rxpkt[53]));
-			int s1 = rxpkt[44];
-			int s2 = rxpkt[45];
-			int s3 = rxpkt[46];
-			int s4 = rxpkt[47] + 1;
-			txpkt[47] += 1;
-			txpkt[53] = 0b00010000;
-			txpkt[48] = s1;
-			txpkt[49] = s2;
-			txpkt[50] = s3;
-			txpkt[51] = s4;
-			this.sendData(txpkt);
-		}   
+			// if the client is not synced, this is an SYNACK, so just send back ACK
+
+			this.txpkt = sendAckOnSynAck(this.txpkt, rxpkt);
+			this.sendData(this.txpkt);
+			if (!sync) {
+				int[] newpkt = sendHTTP(this.txpkt);
+				this.sendData(newpkt);
+				sync = true;
+			}
+		}
+	}
+
+	public int[] sendHTTP(int[] txpkt) {
+		String request = "GET / HTTP/1.0\r\n\r\n";
+		int[] http = toInts(request);
+		int[] newpkt = new int[60+http.length];
+		for (int i = 0; i < txpkt.length; i++) {
+			newpkt[i] = txpkt[i];
+		}
+		// set payload to 45
+		newpkt[5] = 38;
+		// set flags to 0
+		newpkt[53] = 0b00010000;
+		// incr seq num
+//		newpkt[47] += 1;
+		for (int i = 0; i < http.length; i++) {
+			int j = i + 60;
+			newpkt[j] = http[i];
+		}
+		return newpkt;
+	}
+
+	public int[] toInts(String s) {
+
+		char[] cArray=s.toCharArray();
+		int[] result = new int[cArray.length];
+
+		for(int i = 0; i<cArray.length; i++)
+		{
+			result[i] = (int) cArray[i];
+
+		}
+		return result;
+	}
+
+	public int[] sendFin(int[] txpkt, int[] rxpkt) {
+		System.out.print("Received "+rxpkt.length+" bytes: ");
+		System.out.println(Integer.toBinaryString(rxpkt[53]));
+		int s1 = rxpkt[44];
+		int s2 = rxpkt[45];
+		int s3 = rxpkt[46];
+		int s4 = rxpkt[47] + 1;
+		txpkt[47] += 1;
+		txpkt[53] = 0b00010001;
+		txpkt[48] = s1;
+		txpkt[49] = s2;
+		txpkt[50] = s3;
+		txpkt[51] = s4;
+		return txpkt;
+	}
+
+	public int[] sendAckOnSynAck(int[] txpkt, int[] rxpkt) {
+		System.out.print("Received "+rxpkt.length+" bytes: ");
+		System.out.println(Integer.toBinaryString(rxpkt[53]));
+		int s1 = rxpkt[44];
+		int s2 = rxpkt[45];
+		int s3 = rxpkt[46];
+		int s4 = rxpkt[47] + 1;
+		txpkt[47] = rxpkt[51];
+		txpkt[53] = 0b00010000;
+		txpkt[48] = s1;
+		txpkt[49] = s2;
+		txpkt[50] = s3;
+		txpkt[51] = s4;
+		return txpkt;
 	}
 }
