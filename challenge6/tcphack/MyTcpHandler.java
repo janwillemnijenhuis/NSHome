@@ -15,9 +15,24 @@ class MyTcpHandler extends TcpHandler {
 
 		txpkt[0] = 0x60;	// first byte of the IPv6 header contains version number in upper nibble
 		// fill in the rest of the packet yourself...:
-		txpkt[1] = .........;
-		txpkt[2] = .........;
-		......
+		txpkt[8] = 0x2001;
+		txpkt[9] = 0x67c;
+		txpkt[10] = 0x2565;
+		txpkt[11] = 0xa303;
+		txpkt[12] = 0x598b;
+		txpkt[13] = 0xa4ef;
+		txpkt[14] = 0x889b;
+		txpkt[15] = 0x361f;
+
+		txpkt[16] = 0x2001;
+		txpkt[17] = 0x610;
+		txpkt[18] = 0x1908;
+		txpkt[19] = 0xff02;
+		txpkt[20] = 0xf57a;
+		txpkt[21] = 0xc534;
+		txpkt[22] = 0x9c8c;
+		txpkt[23] = 0xfbd4;
+
 
 		this.sendData(txpkt);	// send the packet
 
